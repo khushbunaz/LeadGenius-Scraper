@@ -1,0 +1,624 @@
+{% extends "layout.html" %}
+
+{% block head_content %}
+<style>
+    .dashboard-container {
+        padding: 2rem 0;
+    }
+    
+    .dashboard-header {
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: var(--bs-dark);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+        height: 100%;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .lead-card {
+        background: var(--bs-dark);
+        border-radius: 1rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+    
+    .lead-card-header {
+        padding: 1rem 1.5rem;
+        background: var(--bs-primary);
+        color: white;
+    }
+    
+    .lead-card-body {
+        padding: 1.5rem;
+    }
+    
+    .lead-score {
+        display: inline-block;
+        width: 3rem;
+        height: 3rem;
+        line-height: 3rem;
+        text-align: center;
+        border-radius: 50%;
+        font-weight: bold;
+        color: white;
+    }
+    
+    .score-high {
+        background-color: var(--bs-success);
+    }
+    
+    .score-medium {
+        background-color: var(--bs-warning);
+    }
+    
+    .score-low {
+        background-color: var(--bs-danger);
+    }
+    
+    .social-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: transform 0.2s;
+    }
+    
+    .social-badge:hover {
+        transform: translateY(-2px);
+    }
+    
+    .social-badge.linkedin {
+        background-color: #0077B5;
+        color: white;
+    }
+    
+    .social-badge.twitter {
+        background-color: #1DA1F2;
+        color: white;
+    }
+    
+    .social-badge.instagram {
+        background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+        color: white;
+    }
+    
+    .social-badge.facebook {
+        background-color: #4267B2;
+        color: white;
+    }
+    
+    .lead-actions .btn {
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filters-container {
+        background: var(--bs-dark);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .no-leads-container {
+        background: var(--bs-dark);
+        border-radius: 1rem;
+        padding: 3rem;
+        text-align: center;
+        margin-top: 2rem;
+    }
+    
+    .lead-detail-modal .modal-content {
+        border-radius: 1rem;
+    }
+    
+    .lead-detail-header {
+        background: var(--bs-primary);
+        color: white;
+        border-top-left-radius: 1rem;
+        border-top-right-radius: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .lead-detail-body {
+        padding: 2rem;
+    }
+    
+    .lead-tabs .nav-link {
+        font-weight: 500;
+    }
+    
+    .lead-tabs .nav-link.active {
+        background-color: var(--bs-primary);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container dashboard-container">
+    <div class="dashboard-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Lead Dashboard</h1>
+            <div>
+                <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#scrapeModal">
+                    <i class="fas fa-plus me-2"></i> Add Leads
+                </button>
+                <div class="dropdown d-inline-block">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-download me-2"></i> Export
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                        <li><a class="dropdown-item" href="#" onclick="exportLeads('csv')"><i class="fas fa-file-csv me-2"></i> CSV</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="exportLeads('excel')"><i class="fas fa-file-excel me-2"></i> Excel</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="exportLeads('json')"><i class="fas fa-file-code me-2"></i> JSON</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics Row -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="text-muted">Total Leads</h5>
+                        <div class="stat-value" id="stat-total-leads">-</div>
+                    </div>
+                    <div>
+                        <i class="fas fa-users fa-2x text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="text-muted">High-Value Leads</h5>
+                        <div class="stat-value" id="stat-high-value-leads">-</div>
+                    </div>
+                    <div>
+                        <i class="fas fa-star fa-2x text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="text-muted">Average Score</h5>
+                        <div class="stat-value" id="stat-avg-score">-</div>
+                    </div>
+                    <div>
+                        <i class="fas fa-chart-line fa-2x text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="text-muted">Follow-ups</h5>
+                        <div class="stat-value" id="stat-followups">-</div>
+                    </div>
+                    <div>
+                        <i class="fas fa-calendar-check fa-2x text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="filters-container">
+        <h5 class="mb-3">Filter Leads</h5>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <select class="form-select" id="industry-filter">
+                    <option value="">All Industries</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Retail">Retail</option>
+                    <option value="Manufacturing">Manufacturing</option>
+                    <option value="Education">Education</option>
+                    <option value="Real Estate">Real Estate</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select" id="email-status-filter">
+                    <option value="">All Email Statuses</option>
+                    <option value="valid">Valid</option>
+                    <option value="risky">Risky</option>
+                    <option value="invalid">Invalid</option>
+                    <option value="unknown">Unknown</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select" id="company-size-filter">
+                    <option value="">All Company Sizes</option>
+                    <option value="Enterprise">Enterprise</option>
+                    <option value="Mid-Market">Mid-Market</option>
+                    <option value="SMB">Small Business</option>
+                </select>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end mt-3">
+            <button class="btn btn-primary" id="apply-filters-btn">
+                <i class="fas fa-filter me-2"></i> Apply Filters
+            </button>
+        </div>
+    </div>
+    
+    <!-- Leads List -->
+    <div id="leads-container">
+        <!-- Leads will be populated here -->
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3">Loading leads...</p>
+        </div>
+    </div>
+    
+    <!-- No Leads State -->
+    <div id="no-leads-container" class="no-leads-container d-none">
+        <i class="fas fa-user-slash fa-4x mb-4 text-muted"></i>
+        <h3>No Leads Found</h3>
+        <p class="text-muted mb-4">You don't have any leads yet or none match your current filters.</p>
+        <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#scrapeModal">
+            <i class="fas fa-plus me-2"></i> Add Your First Lead
+        </button>
+    </div>
+</div>
+
+<!-- Lead Detail Modal -->
+<div class="modal fade lead-detail-modal" id="leadDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="lead-detail-header">
+                <h4 class="modal-title" id="lead-detail-title">Lead Details</h4>
+            </div>
+            <div class="lead-detail-body">
+                <ul class="nav nav-tabs lead-tabs mb-4" id="leadDetailTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview-tab-content" type="button" role="tab">
+                            <i class="fas fa-info-circle me-2"></i> Overview
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="company-tab" data-bs-toggle="tab" data-bs-target="#company-tab-content" type="button" role="tab">
+                            <i class="fas fa-building me-2"></i> Company
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="social-tab" data-bs-toggle="tab" data-bs-target="#social-tab-content" type="button" role="tab">
+                            <i class="fas fa-share-alt me-2"></i> Social Media
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="followup-tab" data-bs-toggle="tab" data-bs-target="#followup-tab-content" type="button" role="tab">
+                            <i class="fas fa-calendar-alt me-2"></i> Follow-up
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="competitors-tab" data-bs-toggle="tab" data-bs-target="#competitors-tab-content" type="button" role="tab">
+                            <i class="fas fa-users me-2"></i> Competitors
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis-tab-content" type="button" role="tab">
+                            <i class="fas fa-chart-pie me-2"></i> Analysis
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="leadDetailTabsContent">
+                    <!-- Overview Tab -->
+                    <div class="tab-pane fade show active" id="overview-tab-content" role="tabpanel" aria-labelledby="overview-tab">
+                        <div id="lead-overview-content">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Company Tab -->
+                    <div class="tab-pane fade" id="company-tab-content" role="tabpanel" aria-labelledby="company-tab">
+                        <div id="lead-company-content">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Social Media Tab -->
+                    <div class="tab-pane fade" id="social-tab-content" role="tabpanel" aria-labelledby="social-tab">
+                        <div id="lead-social-content">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Follow-up Tab -->
+                    <div class="tab-pane fade" id="followup-tab-content" role="tabpanel" aria-labelledby="followup-tab">
+                        <div id="lead-followup-content">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Competitors Tab -->
+                    <div class="tab-pane fade" id="competitors-tab-content" role="tabpanel" aria-labelledby="competitors-tab">
+                        <div id="lead-competitors-content">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Analysis Tab -->
+                    <div class="tab-pane fade" id="analysis-tab-content" role="tabpanel" aria-labelledby="analysis-tab">
+                        <div id="lead-analysis-content">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modal footer -->
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Schedule Follow-up Modal -->
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Schedule Follow-up</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="scheduleForm">
+                    <input type="hidden" id="schedule-lead-id">
+                    <div class="mb-3">
+                        <label for="follow-up-date" class="form-label">Follow-up Date</label>
+                        <input type="date" class="form-control" id="follow-up-date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="follow-up-type" class="form-label">Follow-up Type</label>
+                        <select class="form-select" id="follow-up-type" required>
+                            <option value="email">Email</option>
+                            <option value="call">Phone Call</option>
+                            <option value="meeting">Meeting</option>
+                            <option value="linkedin">LinkedIn Message</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="follow-up-notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="follow-up-notes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="save-schedule-btn">Schedule</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Lead Modal -->
+<div class="modal fade" id="scrapeModal" tabindex="-1" aria-labelledby="scrapeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scrapeModalLabel">Add New Leads</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="scrapeModalTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="scrape-tab" data-bs-toggle="tab" data-bs-target="#scrape-content" type="button" role="tab">
+                            <i class="fas fa-spider me-2"></i> Scrape Leads
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual-content" type="button" role="tab">
+                            <i class="fas fa-edit me-2"></i> Add Manually
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content mt-4" id="scrapeModalTabContent">
+                    <div class="tab-pane fade show active" id="scrape-content" role="tabpanel">
+                        <form id="scrapeForm">
+                            <div class="mb-3">
+                                <label for="sourceUrl" class="form-label">Website URL </label>
+                                <input type="text" class="form-control" id="sourceUrl" placeholder="e.g., https://company.com or Company Name" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="leadCount" class="form-label">Maximum Leads (optional)</label>
+                                        <input type="number" class="form-control" id="leadCount" value="10" min="1" max="100">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="industryFilter" class="form-label">Industry Filter (optional)</label>
+                                        <select class="form-select" id="industryFilter">
+                                            <option value="">All Industries</option>
+                                            <option value="Technology">Technology</option>
+                                            <option value="Finance">Finance</option>
+                                            <option value="Healthcare">Healthcare</option>
+                                            <option value="Retail">Retail</option>
+                                            <option value="Manufacturing">Manufacturing</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-primary" id="startScrapeBtn">
+                                    <i class="fas fa-search me-2"></i> Start Scraping
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="manual-content" role="tabpanel">
+                        <form id="manualForm">
+                            <div class="mb-3">
+                                <label for="manualName" class="form-label">Contact Name</label>
+                                <input type="text" class="form-control" id="manualName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="manualEmail" class="form-label">Contact Email</label>
+                                <input type="email" class="form-control" id="manualEmail" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="manualCompany" class="form-label">Company Name</label>
+                                <input type="text" class="form-control" id="manualCompany" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="manualIndustry" class="form-label">Industry</label>
+                                        <select class="form-select" id="manualIndustry">
+                                            <option value="Technology">Technology</option>
+                                            <option value="Finance">Finance</option>
+                                            <option value="Healthcare">Healthcare</option>
+                                            <option value="Retail">Retail</option>
+                                            <option value="Manufacturing">Manufacturing</option>
+                                            <option value="Education">Education</option>
+                                            <option value="Real Estate">Real Estate</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="manualSize" class="form-label">Company Size</label>
+                                        <select class="form-select" id="manualSize">
+                                            <option value="Enterprise">Enterprise</option>
+                                            <option value="Mid-Market">Mid-Market</option>
+                                            <option value="SMB">Small Business</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i> Add Lead
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Generate Email Modal -->
+<div class="modal fade" id="emailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Email Template</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Subject Line</label>
+                    <input type="text" class="form-control" id="email-subject" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email Body</label>
+                    <textarea class="form-control" id="email-body" rows="10" readonly></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="copy-email-btn">
+                    <i class="fas fa-copy me-2"></i> Copy to Clipboard
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- LinkedIn Connect Modal -->
+<div class="modal fade" id="linkedinModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">LinkedIn Connection Message</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Connection Message</label>
+                    <textarea class="form-control" id="linkedin-message" rows="4" readonly></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Profile Link</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="linkedin-profile-link" readonly>
+                        <a class="btn btn-outline-primary" id="open-linkedin-link" target="_blank">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="copy-linkedin-btn">
+                    <i class="fas fa-copy me-2"></i> Copy Message
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

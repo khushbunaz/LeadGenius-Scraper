@@ -1,0 +1,296 @@
+{% extends "layout.html" %}
+
+{% block head_content %}
+<style>
+    .scraper-container {
+        padding: 2rem 0;
+    }
+    
+    .scraper-section {
+        background: var(--card-bg);
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .scraper-title {
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+    }
+    
+    .results-container {
+        margin-top: 2rem;
+    }
+    
+    .company-preview {
+        background: var(--card-bg);
+        border-radius: 1rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        margin-top: 2rem;
+        overflow: hidden;
+    }
+    
+    .company-preview-header {
+        padding: 1.5rem;
+        background: var(--primary-color);
+        color: white;
+    }
+    
+    .company-preview-body {
+        padding: 2rem;
+    }
+    
+    .social-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: transform 0.2s;
+    }
+    
+    .social-badge:hover {
+        transform: translateY(-2px);
+    }
+    
+    .social-badge.linkedin {
+        background-color: #0077B5;
+        color: white;
+    }
+    
+    .social-badge.twitter {
+        background-color: #1DA1F2;
+        color: white;
+    }
+    
+    .social-badge.instagram {
+        background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+        color: white;
+    }
+    
+    .social-badge.facebook {
+        background-color: #4267B2;
+        color: white;
+    }
+    
+    .company-detail-text {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .company-detail-text p {
+        color: #212529; /* Darker text for better contrast */
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+    
+    .company-description {
+        color: var(--text-primary) !important; /* Use theme text color */
+        font-weight: 500; /* Slightly bolder than normal */
+        background-color: #2b3035; /* Dark background for better contrast */
+        padding: 0.5rem;
+        border-radius: 4px;
+        display: block; /* Ensure it's a block element */
+        margin-bottom: 0.5rem; /* Add space below */
+        border-left: 3px solid #0d6efd; /* Blue left border for emphasis */
+    }
+    
+    /* Style for the AI summary to make it distinct from description */
+    .ai-summary {
+        border-left: 4px solid #198754 !important; /* Green left border */
+        background-color: #2b3035;
+        padding: 0.75rem;
+        border-radius: 4px;
+        margin-top: 1rem;
+        font-style: italic;
+        color: var(--text-primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container scraper-container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Web Scraper</h1>
+            <p class="lead mb-5">Extract company information and generate leads from websites </p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="scraper-section">
+                <h3 class="scraper-title">Scrape Company Information</h3>
+                <form id="scraper-form">
+                    <div class="mb-4">
+                        <label for="scrape-source" class="form-label">Enter Company URL </label>
+                        <input type="text" class="form-control form-control-lg" id="scrape-source" 
+                            placeholder="e.g., https://company.com" required>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i> Enter a company website URL for best results
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search me-2"></i> Start Scraping
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Results will be displayed here -->
+            <div id="scrape-results" class="d-none"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Lead Modal -->
+<div class="modal fade" id="add-lead-modal" tabindex="-1" aria-labelledby="add-lead-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add-lead-modal-label">Add Lead</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="add-lead-form">
+                    <div class="mb-3">
+                        <label for="lead-name" class="form-label">Lead Name</label>
+                        <input type="text" class="form-control" id="lead-name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="lead-email" class="form-label">Lead Email</label>
+                        <input type="email" class="form-control" id="lead-email" required>
+                        <div class="form-text">The email will be validated automatically.</div>
+                    </div>
+                    <input type="hidden" id="lead-company-data">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submit-lead-btn">Add Lead</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scrape Modal -->
+<div class="modal fade" id="scrapeModal" tabindex="-1" aria-labelledby="scrapeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scrapeModalLabel">Add New Leads</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="scrapeModalTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="scrape-tab" data-bs-toggle="tab" data-bs-target="#scrape-content" type="button" role="tab">
+                            <i class="fas fa-spider me-2"></i> Scrape Leads
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual-content" type="button" role="tab">
+                            <i class="fas fa-edit me-2"></i> Add Manually
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content mt-4" id="scrapeModalTabContent">
+                    <div class="tab-pane fade show active" id="scrape-content" role="tabpanel">
+                        <form id="scrapeForm">
+                            <div class="mb-3">
+                                <label for="sourceUrl" class="form-label">Website URL</label>
+                                <input type="text" class="form-control" id="sourceUrl" placeholder="e.g., https://company.com " required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="leadCount" class="form-label">Maximum Leads (optional)</label>
+                                        <input type="number" class="form-control" id="leadCount" value="10" min="1" max="100">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="industryFilter" class="form-label">Industry Filter (optional)</label>
+                                        <select class="form-select" id="industryFilter">
+                                            <option value="">All Industries</option>
+                                            <option value="Technology">Technology</option>
+                                            <option value="Finance">Finance</option>
+                                            <option value="Healthcare">Healthcare</option>
+                                            <option value="Retail">Retail</option>
+                                            <option value="Manufacturing">Manufacturing</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-primary" id="startScrapeBtn">
+                                    <i class="fas fa-search me-2"></i> Start Scraping
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="manual-content" role="tabpanel">
+                        <form id="manualForm">
+                            <div class="mb-3">
+                                <label for="manualName" class="form-label">Contact Name</label>
+                                <input type="text" class="form-control" id="manualName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="manualEmail" class="form-label">Contact Email</label>
+                                <input type="email" class="form-control" id="manualEmail" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="manualCompany" class="form-label">Company Name</label>
+                                <input type="text" class="form-control" id="manualCompany" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="manualIndustry" class="form-label">Industry</label>
+                                        <select class="form-select" id="manualIndustry">
+                                            <option value="Technology">Technology</option>
+                                            <option value="Finance">Finance</option>
+                                            <option value="Healthcare">Healthcare</option>
+                                            <option value="Retail">Retail</option>
+                                            <option value="Manufacturing">Manufacturing</option>
+                                            <option value="Education">Education</option>
+                                            <option value="Real Estate">Real Estate</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="manualSize" class="form-label">Company Size</label>
+                                        <select class="form-select" id="manualSize">
+                                            <option value="Enterprise">Enterprise</option>
+                                            <option value="Mid-Market">Mid-Market</option>
+                                            <option value="SMB">Small Business</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i> Add Lead
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/scraper.js') }}"></script>
+{% endblock %}

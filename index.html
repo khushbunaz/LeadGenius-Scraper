@@ -1,0 +1,174 @@
+{% extends "layout.html" %}
+
+{% block head_content %}
+<style>
+    .hero-section {
+        background: linear-gradient(45deg, var(--bs-dark), var(--bs-secondary));
+        padding: 5rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .feature-card {
+        background: var(--bs-dark);
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        margin-bottom: 2rem;
+        transition: transform 0.3s;
+        height: 100%;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .feature-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--bs-primary);
+    }
+    
+    .cta-section {
+        background: var(--bs-dark);
+        padding: 4rem 0;
+        border-radius: 1rem;
+        margin: 3rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Discover and Connect with High-Value Leads</h1>
+                <p class="lead mb-4">Automate your lead generation process with AI-powered tools. Extract valuable company information, detect social media profiles, and connect with potential clients faster.</p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                    <a href="{{ url_for('scraper') }}" class="btn btn-primary btn-lg px-4 me-md-2">
+                        <i class="fas fa-search me-2"></i> Try Web Scraper
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-chart-line me-2"></i> Go to Dashboard
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block">
+                <div class="text-center">
+                    <svg width="500" height="300" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="50" y="50" width="500" height="300" rx="20" fill="#2b3035" stroke="#0d6efd" stroke-width="4"/>
+                        <circle cx="150" cy="150" r="60" fill="#0d6efd" opacity="0.7"/>
+                        <circle cx="350" cy="150" r="80" fill="#0dcaf0" opacity="0.5"/>
+                        <circle cx="250" cy="250" r="70" fill="#6f42c1" opacity="0.6"/>
+                        <path d="M100,200 Q250,50 400,200" stroke="#20c997" stroke-width="6" fill="none"/>
+                        <path d="M150,300 Q300,200 450,300" stroke="#ffc107" stroke-width="6" fill="none"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="container mb-5">
+    <h2 class="text-center mb-5">Powerful Features</h2>
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-spider"></i>
+                </div>
+                <h3>Web Scraping</h3>
+                <p>Extract company information from websites or search engines with our advanced scraping technology.</p>
+                <ul class="list-unstyled mt-3">
+                    <li><i class="fas fa-check text-success me-2"></i> Company details</li>
+                    <li><i class="fas fa-check text-success me-2"></i> Contact information</li>
+                    <li><i class="fas fa-check text-success me-2"></i> Industry classification</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>AI Analysis</h3>
+                <p>Leverage artificial intelligence to analyze leads and understand their potential value to your business.</p>
+                <ul class="list-unstyled mt-3">
+                    <li><i class="fas fa-check text-success me-2"></i> Lead scoring</li>
+                    <li><i class="fas fa-check text-success me-2"></i> AI summaries</li>
+                    <li><i class="fas fa-check text-success me-2"></i> Personalized outreach</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-share-alt"></i>
+                </div>
+                <h3>Social Media Detection</h3>
+                <p>Find and verify social media profiles of companies and decision-makers to expand your reach.</p>
+                <ul class="list-unstyled mt-3">
+                    <li><i class="fas fa-check text-success me-2"></i> LinkedIn profiles</li>
+                    <li><i class="fas fa-check text-success me-2"></i> Twitter accounts</li>
+                    <li><i class="fas fa-check text-success me-2"></i> Facebook & Instagram</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+                <h3>Email Generation</h3>
+                <p>Create personalized cold email templates based on lead data to improve response rates.</p>
+                <ul class="list-unstyled mt-3">
+                    <li><i class="fas fa-check text-success me-2"></i> Industry-specific templates</li>
+                    <li><i class="fas fa-check text-success me-2"></i> Personalized content</li>
+                    <li><i class="fas fa-check text-success me-2"></i> One-click generation</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Competitor Analysis</h3>
+                <p>Identify and analyze competitors to understand the competitive landscape for each lead.</p>
+                <ul class="list-unstyled mt-3">
+                    <li><i class="fas fa-check text-success me-2"></i> Competitor identification</li>
+                    <li><i class="fas fa-check text-success me-2"></i> Strength/weakness analysis</li>
+                    <li><i class="fas fa-check text-success me-2"></i> Market positioning</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h3>Follow-up Scheduling</h3>
+                <p>Set up and manage follow-up schedules for your leads to maintain consistent communication.</p>
+                <ul class="list-unstyled mt-3">
+                    <li><i class="fas fa-check text-success me-2"></i> Schedule reminders</li>
+                    <li><i class="fas fa-check text-success me-2"></i> Follow-up tracking</li>
+                    <li><i class="fas fa-check text-success me-2"></i> Activity logging</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section">
+    <div class="container text-center">
+        <h2 class="mb-4">Ready to Supercharge Your Lead Generation?</h2>
+        <p class="lead mb-4">Start finding and connecting with high-value leads today.</p>
+        <a href="{{ url_for('scraper') }}" class="btn btn-primary btn-lg px-5">
+            <i class="fas fa-rocket me-2"></i> Get Started Now
+        </a>
+    </div>
+</section>
+{% endblock %}

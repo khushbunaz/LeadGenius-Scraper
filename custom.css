@@ -1,0 +1,215 @@
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --card-bg: #2b3035;
+    --text-primary: #f8f9fa;
+    --text-secondary: #adb5bd;
+    --border-color: #495057;
+}
+
+body {
+    background-color: #1a1d20;
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.navbar {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+main {
+    min-height: calc(100vh - 128px);
+}
+
+.footer {
+    margin-top: 2rem;
+}
+
+/* Card styling */
+.card {
+    background-color: var(--card-bg);
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-title {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Form controls */
+.form-control, .form-select {
+    background-color: #343a40;
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #3a4047;
+    color: var(--text-primary);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.form-control::placeholder {
+    color: var(--text-secondary);
+}
+
+/* Buttons */
+.btn {
+    border-radius: 0.375rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-success {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Modal customization */
+.modal-content {
+    background-color: var(--card-bg);
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.modal-header {
+    border-bottom-color: var(--border-color);
+}
+
+.modal-footer {
+    border-top-color: var(--border-color);
+}
+
+/* Table styling */
+.table {
+    color: var(--text-primary);
+}
+
+.table > :not(caption) > * > * {
+    padding: 0.75rem;
+    border-bottom-color: var(--border-color);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Dashboard specific */
+.lead-score {
+    font-weight: bold;
+    text-align: center;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.score-high {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.score-medium {
+    background-color: var(--warning-color);
+    color: black;
+}
+
+.score-low {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+/* Fixed height scrollable containers */
+.scrollable-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Navigation and tabs */
+.nav-tabs .nav-link {
+    color: var(--text-secondary);
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0.75rem 1rem;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: transparent;
+    color: var(--text-primary);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    background-color: transparent;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* Alerts */
+.alert {
+    border: none;
+    border-radius: 0.375rem;
+}
+
+/* Badge customization */
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+}
+
+/* Progress bar */
+.progress {
+    background-color: #343a40;
+    height: 0.75rem;
+    border-radius: 0.375rem;
+}
+
+/* Animation for loading states */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .lead-actions .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
